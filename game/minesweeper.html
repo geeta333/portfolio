@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>minesweeper</title>
+    <meta charset="utf-8">
+    <style type="text/css">
+        input.number {
+            width: 30px;
+        }
+        div {
+            width: 1000px;
+        }
+        table {
+            text-align: center;
+            font-size: 13px;
+            width: auto;
+        }
+        
+        tr, td {
+            padding: 0;
+            cursor: pointer;
+        }
+        
+        td {
+            width: 22px;
+            height: 22px;
+        }
+        
+        td.cell {
+            background-color: gray;
+        }
+
+        td.open {
+            background-color: white;
+        }
+    </style>
+</head>
+<body onload="init()">
+    <h1 id="title">Minesweeper</h1>
+    <h2>time:<span id="time">00:00.000</span></h2>
+    <form name="form1" action="">
+        <p>マス目　<input name="masume" type="number" value="10" class="number" max="40" min="2">　（最大40）</p>
+        <p>爆弾の数　<input name="bomb" type="number" value="10" class="number" min="1"></p>
+        <p><input type="button" value="マス目と爆弾の数を変更" id="change"></p>
+    </form>
+    <div>
+        <table id="main" border="1"></table>
+    </div>
+    <br>
+    <button id="reset">リセット</button>
+    <script type="text/javascript">
+        "use strict";
+        var W = 10, H = 10, BOMB = 10, cell = [], opened = 0, timer = NaN;
+        var startTime;
+        var elapsedTime = 0;
+        var timerId;
+        var form = document.forms.form1;
+        
+        //最初に読み込む
+        function init() {
+            var main = document.getElementById("main");
+            
+            for (var i = 0; i < H; i++) {
+                cell[i] = [];
+                var tr = document.createElement("tr");
+                main.appendChild(tr);
+                for (var j = 0; j < W; j++) {
+                    var td = document.createElement("td");
+                    td.addEventListener("click", click);
+                    td.className = "cell";
+                    td.y = i;
+                    td.x = j;
+                    cell[i][j] = td;
+                    tr.appendChild(td);
+                }
+            }
+            
+            for (var i = 0; i < BOMB; i++) {
+                while (true) {
+                    var x = Math.floor(Math.random() * W);
+                    var y = Math.floor(Math.random() * H);
+                    if (!cell[x][y].bomb) {
+                        cell[x][y].bomb = true;
+                        //cell[x][y].textContent = "+";
+                        break;
+                    }
+                }
+            }
+        }
+        
+        //周囲にいくつ爆弾があるか？
+        function count(x, y) {
+            var b = 0;
+            for (var j = y - 1;j <= y + 1; j++) {
+                for (var i = x - 1; i <= x + 1; i++) {
+                    if (cell[j] && cell[j][i]) {
+                        if (cell[j][i].bomb) b++;
+                    }
+                }
+            }
+            return b;
+        }
+        
+        //マスを開く際の処理まとめ
+        function open(x, y) {
+            for (var j = y - 1; j <= y + 1; j++) {
+                for (var i = x - 1; i <= x + 1; i++) {
+                    if (cell[j] && cell[j][i]) {
+                        var c = cell[j][i];
+                        if (c.opened || c.bomb) {
+                            continue;
+                        }
+                        flip(c);
+                        var n = count(i, j);
+                        if (n == 0) {
+                            open(i, j);
+                        } else {
+                            c.textContent = n;
+                        }
+                    }
+                }
+            }
+        }
+        
+        //そのマス目を開く
+        function flip(cell) {
+            cell.className = "cell open";
+            cell.opened = true;
+            if (++opened >= (W * H - BOMB)) {
+                document.getElementById("title").textContent = "Good Job!";
+                clearTimeout(timerId);
+                endGame();
+//                alert("Good Job!");
+            }
+        }
+        
+        //クリックした時に実行
+        function click(e) {
+            var src = e.currentTarget;
+            var td = document.getElementsByTagName("td");
+            var result = td.className;
+            if (src.bomb) {
+                cell.forEach(function (tr) {
+                    tr.forEach(function (td) {
+                        if (td.bomb) {
+                            td.textContent = "+";
+                            clearTimeout(timerId);
+                        }
+                    })
+                });
+                document.getElementById("title").textContent = "Game Over";
+                endGame();
+            } else if (hasClassopen()) {
+                timecounter();
+                open(src.x, src.y);
+            } else {
+                open(src.x, src.y);
+            }
+        }
+        
+        //openがあったらfalseを返す
+        function hasClassopen() {
+            var td = document.getElementsByTagName("td");
+            for (var i = 0;i < td.length;i++) {
+                if (td[i].classList.contains("open")) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        //ゲームを止める
+        function endGame() {
+            var td = document.getElementsByTagName("td");
+            for (var i = 0;i < td.length;i++) {
+                td[i].removeEventListener("click", click);
+            }
+        }
+        
+        //タイマー
+        function timecounter() {
+            startTime = Date.now();
+            countUp();
+        }
+        
+        function countUp() {
+            timerId = setTimeout(function() {
+                elapsedTime = Date.now() - startTime;
+                updateTimerText();
+                countUp();
+            }, 10);
+        }
+        
+        function updateTimerText() {
+            var m = Math.floor(elapsedTime / 60000);
+            var s = Math.floor(elapsedTime % 60000 / 1000);
+            var ms = elapsedTime % 1000;
+            var timer = document.getElementById("time");
+            s = ("0" + s).slice(-2);
+            m = ("0" + m).slice(-2);
+            ms = ("00" + ms).slice(-3);
+            timer.textContent = m + ":" + s + "." + ms;
+        }
+        
+        //マス目、爆弾の数の変更
+        var change = document.getElementById("change");
+        change.addEventListener("click", function() {
+            document.getElementById("title").textContent = "Minesweeper";
+            clearTimeout(timerId);
+            elapsedTime = 0;
+            updateTimerText();
+            cell.length = 0;
+            opened = 0;
+            var main = document.getElementById("main");
+            main.textContent = null;
+            if (form.masume.value < 1) {
+                alert("マス目が少なすぎます！");
+                init();
+            } else if (form.masume.value > 40) {
+                alert("マス目が多すぎます！");
+                init();
+            } else if (form.bomb.value < 1) {
+                alert("爆弾がが少なすぎます！");
+                init();
+            } else if (form.masume.value ** 2 <= BOMB) {
+                alert("爆弾が多すぎます！");
+                init();
+            } else {
+                W = form.masume.value;
+                H = form.masume.value;
+                BOMB = form.bomb.value;
+                init();
+            }
+        });
+        
+        //リセット
+        var reset = document.getElementById('reset');
+        reset.addEventListener("click", function() {
+            document.getElementById("title").textContent = "Minesweeper";
+            clearTimeout(timerId);
+            elapsedTime = 0;
+            updateTimerText();
+            cell.length = 0;
+            opened = 0;
+            var main = document.getElementById("main");
+            main.textContent = null;
+            init();
+        });
+        
+        
+    </script>
+</body>
+</html>

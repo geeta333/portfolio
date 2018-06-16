@@ -1,9 +1,10 @@
 /*global $*/
-"use strict";
-$(function() {
+/*global window*/
+'use strict';
+$(function () {
     
     $('.menu').hide();
-    $(window).scroll(function() {
+    $(window).scroll(function () {
         if ($(this).scrollTop() > 500) {
             $('.menu').fadeIn();
         } else {
@@ -13,14 +14,14 @@ $(function() {
     
 //    $('.menu-active').hide();
     $('.header-bottom').hide();
-    $('.menu-icon').click(function() {
+    $('.menu-icon').click(function () {
         $('.header-bottom').fadeToggle();
         $('.menu-icon i').toggleClass('menu-inactive');
     });
     
     
     function hideShow(portfolioName, showPortfolio) {
-        $(portfolioName).click(function() {
+        $(portfolioName).click(function () {
             if ($(showPortfolio).hasClass('text-active')) {
                 $(showPortfolio).removeClass('text-active');
             } else {
@@ -33,7 +34,7 @@ $(function() {
     hideShow('.portfolio1', '.p1');
     hideShow('.portfolio2', '.p2');
     
-    $('a.internal-link').click(function() {
+    $('a.internal-link').click(function () {
         var id = $(this).attr('href');
         var position = $(id).offset().top;
         $('html,body').animate({
