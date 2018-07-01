@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <title>Tetris</title>
+        <meta charset="utf-8">
+        <style type="text/css">
+            body {
+                font-family: "Helvetica Neue", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+            }
+            .menu {
+                width: 350px;
+                height: 600px;
+                z-index: 10;
+                color: white;
+                text-align: center;
+                background: rgba(0, 0, 0, 0.5);
+                position: fixed;
+                top: 8;
+                left: 8;
+            }
+            
+            #pause, #gameover {
+                display: none;
+            }
+            h1 {
+                margin-top: 50px;
+            }
+            input {
+                width: 300px;
+                font-size: 50px;
+                margin-bottom: 30px;
+            }
+        </style>
+    </head>
+    <body onload="init()">
+        <div>
+            <div id="start" class="menu">
+                <h1>操作説明</h1>
+                <p>
+                    ↑：回転<br>
+                    ←：左移動<br>
+                    →：右移動<br>
+                    ↓：下移動<br>
+                    スペース：hold<br>
+                    p：pause
+                </p>
+                <input type="button" value="start" onclick="timecounter();start();">
+            </div>
+            <div id="pause" class="menu">
+                <h1>操作説明</h1>
+                <p>
+                    ↑：回転<br>
+                    ←：左移動<br>
+                    →：右移動<br>
+                    ↓：下移動<br>
+                    スペース：hold<br>
+                    p：pause
+                </p>
+                <input type="button" value="resume" onclick="resume()">
+                <input type="button" value="restart" onclick="restart();">
+            </div>
+            <div id="gameover" class="menu">
+                <h1>操作説明</h1>
+                <p>
+                    ↑：回転<br>
+                    ←：左移動<br>
+                    →：右移動<br>
+                    ↓：下移動<br>
+                    スペース：hold<br>
+                    p：pause
+                </p>
+                <input type="button" value="restart" onclick="restart();">
+            </div>
+            <canvas id="canvas" width="600" height="600" />
+        </div>
+        <script type="text/javascript">
+            'use strict';
+            addEventListener('keydown', function(e) { keyevents.push(e.keyCode)});
+            var ctx, W = 12, H = 22, field, block, nextBlock, holdBlock, keyevents = [];
+            var interval = 40, count, score, timer, pauseKey = false, collide = true;
+            var timecount = 0;
+            var focus = true;
+            var colors = ['black', 'orange', 'blue', 'aqua', 'lime', 'fuchsia', 'yellow', 'red', 'gray'];
+            var blocks = [
+                [
+                    [
+                        0, 0, 1,
+                        1, 1, 1,
+                        0, 0, 0
+                    ], [
+                        0, 1, 0,
+                        0, 1, 0,
+                        0, 1, 1
+                    ], [
+                        0, 0, 0,
+                        1, 1, 1,
+                        1, 0, 0
+                    ], [
+                        1, 1, 0,
+                        0, 1, 0,
+                        0, 1, 0
+                    ],
+                ], [
+                    [
+                        2, 0, 0,
+                        2, 2, 2,
+                        0, 0, 0
+                    ], [
+                        0, 2, 2,
+                        0, 2, 0,
+                        0, 2, 0
+                    ], [
+                        0, 0, 0,
+                        2, 2, 2,
+                        0, 0, 2
+                    ], [
+                        0, 2, 0,
+                        0, 2, 0,
+                        2, 2, 0
+                    ]
+                ], [
+                    [
+                        0, 3, 0,
+                        3, 3, 3,
+                        0, 0, 0
+                    ], [
+                        0, 3, 0,
+                        0, 3, 3,
+                        0, 3, 0
+                    ], [
+                        0, 0, 0,
+                        3, 3, 3,
+                        0, 3, 0
+                    ], [
+                        0, 3, 0,
+                        3, 3, 0,
+                        0, 3, 0
+                    ]
+                ], [
+                    [
+                        4, 4, 0,
+                        0, 4, 4,
+                        0, 0, 0
+                    ], [
+                        0, 0, 4,
+                        0, 4, 4,
+                        0, 4, 0
+                    ], [
+                        0, 0, 0,
+                        4, 4, 0,
+                        0, 4, 4
+                    ], [
+                        0, 4, 0,
+                        4, 4, 0,
+                        4, 0, 0
+                    ]
+                ], [
+                    [
+                        0, 5, 5,
+                        5, 5, 0,
+                        0, 0, 0
+                    ], [
+                        0, 5, 0,
+                        0, 5, 5,
+                        0, 0, 5
+                    ], [
+                        0, 0, 0,
+                        0, 5, 5,
+                        5, 5, 0
+                    ], [
+                        5, 0, 0,
+                        5, 5, 0,
+                        0, 5, 0
+                    ]
+                ], [
+                    [
+                        6, 6,
+                        6, 6
+                    ], [
+                        6, 6,
+                        6, 6
+                    ], [
+                        6, 6,
+                        6, 6
+                    ], [
+                        6, 6,
+                        6, 6
+                    ]
+                ], [
+                    [
+                        0, 7, 0, 0,
+                        0, 7, 0, 0,
+                        0, 7, 0, 0,
+                        0, 7, 0, 0
+                    ], [
+                        0, 0, 0, 0,
+                        7, 7, 7, 7,
+                        0, 0, 0, 0,
+                        0, 0, 0, 0
+                    ], [
+                        0, 0, 7, 0,
+                        0, 0, 7, 0,
+                        0, 0, 7, 0,
+                        0, 0, 7, 0
+                    ], [
+                        0, 0, 0, 0,
+                        0, 0, 0, 0,
+                        7, 7, 7, 7,
+                        0, 0, 0, 0
+                    ]
+                ]
+            ];
+
+
+            function Block() {
+                this.turn = rand(4);    // 向き0-4
+                this.type = blocks[rand(blocks.length)];    // 0 - 7
+                this.data = this.type[this.turn];   // 今のblockの位置
+
+                this.w = Math.sqrt(this.data.length);   // 2 or 3 or 4
+                this.x = rand(6 - this.w) + 2;  // 落下開始時のx座標
+                this.y = 1 - this.w;    // 落下開始時のy座標
+                this.fire = interval + count;   // 次に落下する時間
+
+                this.update = function() {
+                    //一番下に到達？
+                    if (isHit(this.x, this.y + 1, this.turn)) {
+                        if (collide) { //下にぶつかってからも動ける
+                            while (keyevents.length > 0) {
+                                var code = keyevents.shift();
+                                var dx = 0, dy = 0, nd = this.turn;
+
+                                switch (code) {
+                                    case 32: holdChange(); this.y = 0; break;   //スペース
+                                    case 37: dx = -1; break;    //左
+                                    case 39: dx = +1; break;    //右
+                                    case 40: collide = false; break;    //下
+                                    case 80: pauseKey = true; break;    //p
+                                    default: continue;
+                                }
+
+                                if (!isHit(this.x + dx, this.y, nd)) {
+                                    this.x = this.x + dx;
+                                    this.data = this.type[this.turn];
+                                }
+                            }
+                            timecount++;
+                            if (timecount % 30 == 0) {
+                                collide = false;
+                            }
+                        } else {
+                            processBlockCells(function (x, y, value) {
+                                field[y][x] = value;
+                            });
+
+                            //列を消去、下にブロックを下げる
+                            eraseLine();
+
+                            keyevents = [];
+                            goNextBlock();
+                            collide = true;
+                        }
+                    } else {
+                        //ブロックを一行下へ移動
+                        if (this.fire < count) {
+                            this.fire = count + interval;   //interval時間後落ちる
+                            this.y++;
+                        }
+                    }
+
+
+                    // キーイベントの処理
+                    while (keyevents.length > 0) {
+                        var code = keyevents.shift();
+                        var dx = 0, dy = 0, nd = this.turn;
+
+                        switch (code) {
+                            case 32: holdChange(); this.y = 0; break;   //スペース
+                            case 37: dx = -1; break;    //左
+                            case 38: nd = (nd + 1) % 4; break;  //上
+                            case 39: dx = +1; break;    //右
+                            case 40: dy = +1; break;    //下
+                            case 80: pauseKey = true; break;    //p
+                            default: continue;
+                        }
+                        //もし移動したときhitしているか？
+                        if (!isHit(this.x + dx, this.y + dy, nd)) {
+                            this.x = this.x + dx;
+                            this.y = this.y + dy;
+                            this.turn = nd;
+                            this.data = this.type[this.turn];
+                            if (dy == 1) {
+                                score++;
+                            }
+                        }
+                    }
+                };
+
+                this.draw = function (ctx) {
+                    processBlockCells(function (x, y, value) {
+                        ctx.fillStyle = colors[value];
+                        ctx.fillRect(50 + x * 25, 25 + y * 25, 24, 24);
+                    });
+                }
+            }
+            
+            //乱数をとる
+            function rand(r) {
+                return Math.floor(Math.random() * r);
+            }
+            
+            //引数にfunctionをとる
+            function processBlockCells(func) {
+                for (var i = 0; i < block.data.length; i++) {   // 4 9 16
+                    var x = i % block.w;    // 0 1 2 3　横に繰り返し
+                    var y = Math.floor(i / block.w);    //0 1 2 3　縦に繰り返し
+                    var v = block.data[i];  // blocksの値
+                    if (0 <= y + block.y && y + block.y < H && 
+                        0 <= x + block.x && x + block.x < W && v != 0) {
+                        func(x + block.x, y + block.y, v);
+                    }
+                }
+            }
+            
+            //ホールドする
+            function holdChange() {
+                if (holdBlock == null) {
+                    holdBlock = block;
+                    goNextBlock();
+                } else {
+                    var temp = holdBlock;
+                    holdBlock = block;
+                    block = temp;
+                }
+            }
+            
+            //初めに読み込まれる
+            function init() {
+                var canvas = document.getElementById('canvas');
+                ctx = canvas.getContext('2d');
+                ctx.font = "20pt Arial";
+
+                count = 0;
+                score = 0;
+
+                //フィールドの初期化
+                field = new Array(H);
+                for (var y = 0; y < H ; y++) {
+                    field[y] = new Array(W);
+                    for (var x = 0; x < W; x++) {
+                        field[y][x] = (x == 0 || x == W -1) ? 8 : 0;
+                    }
+                }
+                for (var i = 0; i < W; i++) {
+                    field[H - 1][i] = 8;
+                }
+                
+//                //test
+//                test();
+                
+                //ブロックの初期化
+                goNextBlock();
+                
+                draw();
+                
+            }
+            
+            //メインループの開始
+            function timecounter() {
+                timer = setTimeout(mainLoop, 10);
+            }
+            
+            //メインループ繰り返し
+            function mainLoop() {
+                count++;
+                //スピードアップ
+                if (count % 1000 == 0) {
+                    interval--;
+                }
+
+                //ブロックの位置を更新
+                block.update();
+                
+                //windowにフォーカスが当たっているか？
+                isFocus();
+                
+                // ゲームオーバーの判定
+                if (isGameOver()) {
+                    gameOver();
+                } else if (!focus || pauseKey) {
+                    pauseKey = false;
+                    pause();
+                
+                } else {
+                    timecounter();
+                }
+
+                draw();
+            }
+            
+            //gameoverならtrueを返す
+            function isGameOver() {
+                var c = 0;
+                for (var i = 0; i < W; i++) {
+                    if (field[0][i] != 0) {
+                        c++;
+                        if (c > 2) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            
+            //次のブロックを作る
+            function goNextBlock() {
+                block = nextBlock || new Block();
+                nextBlock = new Block();
+            }
+            
+            //当たったかの判定
+            function isHit(x, y, r) {
+                var data = block.type[r];
+                for (var i = 0; i < block.w; i++) {
+                    for (var j = 0; j < block.w; j++) {
+                        if (i + y >= 0 && j + x >= 0 && i + y < H && j + x < W) {
+                            if (field[i + y][j + x] != 0 && data[i * block.w + j] != 0) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+            
+            //列を消し、行をずらす
+            function eraseLine() {
+                for (var y = 20; y >= 0; y--) { //下から上へ
+                    if (field[y].every(function(v) { return v != 0 })) {
+                        field.splice(y, 1);             // 1行削除
+                        field.unshift(new Array(W));    // 1行追加
+                        score += 100;
+                        for (var i = 0; i < W; i++) {
+                            field[0][i] = (i == 0 || i == W - 1) ? 8 : 0;
+                        }
+                        y++;    //消去した行からもう一度チェック
+                    }
+                }
+            }
+
+            function draw() {
+                //背景の塗りつぶし
+                ctx.fillStyle = 'rgb(0,0,0)';
+                ctx.fillRect(0,0,600,600);
+
+                //フィールドの描画
+                for (var y = 0; y < H; y++) {
+                    for (var x = 0; x < W; x++) {
+                        var v = field[y][x];
+                        ctx.fillStyle = colors[v];
+                        ctx.fillRect(50 + x * 25, 25 + y * 25, 24, 24);
+                    }
+                }
+
+                //落下中のブロックの描画
+                block.draw(ctx);
+
+                //次に出現するブロックの描画
+                nextBlock.data.forEach(function(v, i,data) {
+                    var w = Math.sqrt(data.length);
+                    var x = i % w;
+                    var y = Math.floor(i / w);
+                    ctx.fillStyle = colors[v];
+                    ctx.fillRect(400 + x * 25, 300 + y * 25, 24, 24);
+                });
+                
+                //holdしてるブロックの描画
+                if (holdBlock != null) {
+                    for (var i = 0; i < holdBlock.data.length; i++) {   // 4 9 16
+                        var x = i % holdBlock.w;    // 0 1 2 3　横に繰り返し
+                        var y = Math.floor(i / holdBlock.w);    //0 1 2 3　縦に繰り返し
+                        var v = holdBlock.data[i];  // blocksの値
+                        ctx.fillStyle = colors[v];
+                        ctx.fillRect(400 + x * 25, 450 + y * 25, 24, 24);
+                    }
+                }
+
+                // 各種情報の描画
+                ctx.fillStyle = 'rgb(0,255,0)';
+                ctx.fillText('score:', 400, 130);
+                ctx.fillText(('00000000' + score).slice(-8), 400, 170);
+                ctx.fillText('next:', 400, 270);
+                ctx.fillText('hold:', 400, 420);
+                if (isNaN(timer)) {
+                    ctx.fillText('GAME OVER', 400, 70);
+                }
+            }
+            
+            //フォーカスが当たっているならfalseを返す
+            function isFocus() {
+                window.onfocus = function() {
+                    focus = true;
+                };
+                window.onblur = function() {
+                    focus = false;
+                };
+            }
+            
+            //スタートボタン
+            function start() {
+                document.getElementById("start").style.display = "none";
+                keyevents.length = 0;
+            }
+            
+            //ポーズボタン
+            function pause() {
+                document.getElementById("pause").style.display = "inline-block";
+                clearTimeout(timer);
+                keyevents.length = 0;
+            }
+            
+            //ポーズから再開するボタン
+            function resume() {
+                document.getElementById("pause").style.display = "none";
+                keyevents.length = 0;
+                timecounter();
+            }
+            
+            //リスタートするボタン
+            function restart() {
+                document.getElementById("pause").style.display = "none";
+                document.getElementById("gameover").style.display = "none";
+                interval = 40;
+                count = 0;
+                timer = 0;
+                block.fire = 0;
+                keyevents.length = 0;
+                holdBlock = null;
+                goNextBlock();
+                init();
+                timecounter();
+            }
+            
+            //ゲームオーバーした時の処理
+            function gameOver() {
+                clearTimeout(timer);
+                timer = NaN;
+                document.getElementById("gameover").style.display = "inline-block";
+            }
+        </script>
+    </body>
+</html>

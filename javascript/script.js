@@ -33,6 +33,7 @@ $(function () {
     
     hideShow('.portfolio1', '.p1');
     hideShow('.portfolio2', '.p2');
+    hideShow('.portfolio3', '.p3');
     
     $('a.internal-link').click(function () {
         var id = $(this).attr('href');
