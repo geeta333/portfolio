@@ -13,10 +13,6 @@
     
     /*--- works ---*/
     
-    #works {
-        background-color: aqua;
-    }
-    
     .portfolio {
         width: 30%;
     }
@@ -45,15 +41,29 @@
     
     /*--- header ---*/
     
-    .header-right {
+    #menu {
         display: none;
     }
     
-    .menu-icon {
+    #open-menu {
         display: block;
     }
     
-    .menu-inactive {
+    #close-menu {
+        display: block;
+    }
+    
+    #menu ul {
+        float: left;
+        margin-top: 10px;
+    }
+    
+    #menu.shown {
+        display: block;
+        background-color: white;
+    }
+    
+    #open-menu.hide {
         display: none;
     }
     
@@ -83,8 +93,8 @@
     
     /*--- works ---*/
     
-    #works {
-        background-color: seagreen;
+    .portfolio {
+        width: 50%;
     }
     
     /*--- product-info ---*/
@@ -94,14 +104,14 @@
     }
     
     .pull-left {
-        width: 30%;
+        width: 20%;
         float: left;
         position: absolute;
         bottom: 0
     }
 
     .pull-right {
-        width: 70%;
+        width: 80%;
         float: right;
     }
 
