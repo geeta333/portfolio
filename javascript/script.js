@@ -4,12 +4,12 @@ $(function () {
     'use strict';
     
 //    スクロールした時にメニューを表示
-    $('.menu').hide();
+    $('#menu').hide();
     $(window).scroll(function () {
         if ($(this).scrollTop() > 500) {
-            $('.menu').fadeIn();
+            $('#menu').fadeIn();
         } else {
-            $('.menu').fadeOut();
+            $('#menu').fadeOut();
         }
     });
     
