@@ -1,15 +1,17 @@
 /*global $*/
 /*global window*/
+
+'use strict';
+
 $(function () {
-    'use strict';
     
 //    スクロールした時にメニューを表示
-    $('#menu').hide();
+    $('header').hide();
     $(window).scroll(function () {
         if ($(this).scrollTop() > 500) {
-            $('#menu').fadeIn();
+            $('header').fadeIn();
         } else {
-            $('#menu').fadeOut();
+            $('header').fadeOut();
         }
     });
     
