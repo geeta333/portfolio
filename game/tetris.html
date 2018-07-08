@@ -78,7 +78,7 @@
             'use strict';
             addEventListener('keydown', function(e) { keyevents.push(e.keyCode)});
             var ctx, W = 12, H = 22, field, block, nextBlock, holdBlock, keyevents = [];
-            var interval = 40, count, score, timer, pauseKey = false, collide = true;
+            var interval = 40, count, score, timer = 0, pauseKey = false, collide = true;
             var timecount = 0;
             var focus = true;
             var colors = ['black', 'orange', 'blue', 'aqua', 'lime', 'fuchsia', 'yellow', 'red', 'gray'];
@@ -219,7 +219,7 @@
                 this.data = this.type[this.turn];   // 今のblockの位置
 
                 this.w = Math.sqrt(this.data.length);   // 2 or 3 or 4
-                this.x = rand(6 - this.w) + 2;  // 落下開始時のx座標
+                this.x = rand(6 - this.w) + 3;  // 落下開始時のx座標
                 this.y = 1 - this.w;    // 落下開始時のy座標
                 this.fire = interval + count;   // 次に落下する時間
 
@@ -355,9 +355,6 @@
                 for (var i = 0; i < W; i++) {
                     field[H - 1][i] = 8;
                 }
-                
-//                //test
-//                test();
                 
                 //ブロックの初期化
                 goNextBlock();
