@@ -165,7 +165,6 @@ section {
     width: 100%;
     text-align: center;
     margin-top: 20px;
-    cursor: pointer;
 }
 
 .flex-box {
@@ -174,19 +173,28 @@ section {
     display: -ms-flexbox;
     display: flex;
     -webkit-box-pack: justify;
-    -webkit-justify-content: space-around;
     -ms-flex-pack: justify;
+    -webkit-justify-content: space-around;
     justify-content: space-around;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
     
 }
 
 .portfolio {
     width: 24%;
+    margin-bottom: 20px;
+    cursor: pointer;
 }
 
 .portfolio img {
     width: 100%;
     height: auto;
+}
+
+.portfolio a {
+    background: none;
 }
 
 /*--- product-info ---*/
