@@ -51,6 +51,7 @@ $(function () {
     hideShow('.portfolio1', '.p1');
     hideShow('.portfolio2', '.p2');
     hideShow('.portfolio3', '.p3');
+    hideShow('.portfolio4', '.p4');
     
     
 });
