@@ -13,8 +13,12 @@
     
     /*--- works ---*/
     
-    .portfolio {
-        width: 30%;
+    .portfolio-description {
+        padding: 0;
+    }
+    
+    .portfolio-description p img {
+        height: 50px;
     }
 }
 
@@ -93,27 +97,25 @@
     
     /*--- works ---*/
     
-    .portfolio {
+    .portfolios {
+        text-align: left;
+    }
+    
+    .portfolio-img {
+        float: none !important;
+        margin: 0 0 0 10% !important;
         width: 50%;
+        display: block;
     }
     
-    /*--- product-info ---*/
-    
-    .portfolio {
-        width: 45%;
-    }
-    
-    .pull-left {
-        width: 20%;
+    .portfolio-description {
         float: left;
-        position: absolute;
-        bottom: 0
+        margin-left: 10%;
     }
-
-    .pull-right {
-        width: 80%;
-        float: right;
+    
+    .portfolio-description p {
+        text-align: left;
     }
-
+    
 }
 

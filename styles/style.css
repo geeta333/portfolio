@@ -167,78 +167,60 @@ section {
     margin-top: 20px;
 }
 
-.flex-box {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-pack: justify;
-    -ms-flex-pack: justify;
-    -webkit-justify-content: space-around;
-    justify-content: space-around;
-    -webkit-flex-wrap: wrap;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
-    
-}
-
 .portfolio {
-    width: 24%;
-    margin-bottom: 20px;
-    cursor: pointer;
+    width: 100%;
+    margin: 20px 0;
+    padding: 20px 0;
+    border-top: 3px solid black;
 }
 
-.portfolio img {
+.portfolio:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.portfolio:nth-of-type(odd) .portfolio-img {
+    float: left;
+    margin-left: 10%;
+}
+
+.portfolio:nth-of-type(even) .portfolio-img {
+    float: right;
+    margin-right: 10%;
+}
+
+.portfolio-img {
+    display: inline-block;
+    width: 30%;
+    margin: 0 5%;
+}
+
+.portfolio-img a {
+    opacity: 0.8;
+    background: none;
+}
+
+.portfolio-img a:hover {
+    opacity: 1.0;
+}
+
+.portfolio-img a img {
     width: 100%;
     height: auto;
 }
 
-.portfolio a {
-    background: none;
-}
-
-/*--- product-info ---*/
-
-.product-info {
-    display: none;
-    background-color: white;
-}
-
-.text-active {
-    display: block;
-}
-
-.description li {
-    border-bottom: 3px solid black;
-    position: relative;
-    height: auto;
-}
-
-.description p {
+.portfolio-description {
     display: inline-block;
-    text-align: left;
-    margin: 10px 0 0;
+    width: 50%;
+    height: 100%;
+    padding: 20px 0;
+    vertical-align: middle;
 }
 
-.pull-left {
-    width: 20%;
-    float: left;
-    position: absolute;
-    bottom: 0
-}
-
-.pull-right {
-    width: 80%;
-    float: right;
-}
-
-.pull-right img {
+.portfolio-description p img {
     margin-right: 10px;
-    height: 50px;
-}
-
-#product-info {
-    background-color: lightblue;
+    height: 70px;
 }
 
 /*--- contact ---*/
