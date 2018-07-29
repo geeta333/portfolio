@@ -66,6 +66,10 @@ p {
     margin-bottom: 20px;
 }
 
+.left {
+    text-align: left;
+}
+
 /*--- header ---*/
 
 header {
@@ -221,15 +225,6 @@ section {
 .portfolio-description p img {
     margin-right: 10px;
     height: 70px;
-}
-
-/*--- contact ---*/
-#contact {
-    background-color: rgba(224,224,224,0.5);
-}
-
-#contact h3 {
-    text-align: center;
 }
 
 /*--- footer ---*/
