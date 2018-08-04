@@ -101,16 +101,22 @@
         text-align: left;
     }
     
+    .portfolio {
+        text-align: center;
+        width: 80%;
+        margin: 0 auto;
+    }
+    
     .portfolio-img {
         float: none !important;
-        margin: 0 0 0 10% !important;
+        margin: 0 auto 10px !important;
         width: 50%;
         display: block;
     }
     
     .portfolio-description {
-        float: left;
-        margin-left: 10%;
+        float: none;
+        width: 100%;
     }
     
     .portfolio-description p {

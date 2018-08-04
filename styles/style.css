@@ -227,6 +227,10 @@ section {
     height: 70px;
 }
 
+.portfolio-description .git {
+    word-break: break-all;
+}
+
 /*--- footer ---*/
 
 footer {
